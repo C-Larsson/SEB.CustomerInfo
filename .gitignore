@@ -6,3 +6,5 @@
 /CustomerInfo/CustomerInfo.REST/obj
 /CustomerInfo/.vs/CustomerInfo
 /CustomerInfo/CustomerInfo.Test/obj
+/CustomerInfo/CustomerInfo.REST/bin/Debug/net8.0
+/CustomerInfo/CustomerInfo.Test/bin/Debug/net8.0
