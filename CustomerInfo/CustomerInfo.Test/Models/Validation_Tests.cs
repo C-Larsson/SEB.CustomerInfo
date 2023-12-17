@@ -15,17 +15,17 @@ namespace CustomerInfo.Test.Models
         public void EmailAddressValidation_Tests(string email, bool expectedResult)
         {
             // Arrange
-            var customerInfo = new REST.Models.CustomerInfo()
+            var customer = new Customer()
             {
-                SocialSecurityNumber = "197210161234",
+                SSN = "197210161234",
                 Email = email
             };
 
-            var context = new ValidationContext(customerInfo, serviceProvider: null, items: null);
+            var context = new ValidationContext(customer, serviceProvider: null, items: null);
             var results = new List<ValidationResult>();
 
             // Act
-            bool isValid = Validator.TryValidateObject(customerInfo, context, results, true);
+            bool isValid = Validator.TryValidateObject(customer, context, results, true);
 
             // Assert
             Assert.Equal(expectedResult, isValid);

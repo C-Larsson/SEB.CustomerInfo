@@ -2,10 +2,10 @@
 
 namespace CustomerInfo.REST.Models
 {
-    public class CustomerInfo
+    public class Customer
     {
         [Required(ErrorMessage = "SocialSecurityNumber is required")]
-        public string SocialSecurityNumber { get; set; }
+        public string SSN { get; set; }
 
         [EmailAddress(ErrorMessage = "Invalid e-mail address.")]
         public string? Email { get; set; }
