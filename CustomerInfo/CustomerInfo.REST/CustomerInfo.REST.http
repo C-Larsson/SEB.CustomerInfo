@@ -1,0 +1,6 @@
+@CustomerInfo.REST_HostAddress = http://localhost:5162
+
+GET {{CustomerInfo.REST_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
