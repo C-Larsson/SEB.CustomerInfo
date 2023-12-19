@@ -42,14 +42,10 @@ namespace CustomerInfo.REST.Controllers
                 return BadRequest("Invalid format of Swedish phone number");
 
             if (_customerInfoService.GetBySsn(customer.SSN) != null)
-            {
                 return Conflict("Customer already exists");
-            }
-            else
-            {
-                var customerDB = _customerInfoService.Create(customer);
-                return Created("Customer was created", customerDB);
-            }
+ 
+            var customerDB = _customerInfoService.Create(customer);
+            return Created("Customer was created", customerDB);
         }
 
         // Update a customer

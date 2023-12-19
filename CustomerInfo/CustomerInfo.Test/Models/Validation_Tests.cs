@@ -9,8 +9,9 @@ namespace CustomerInfo.Test.Models
         [InlineData(null, true)] // null is allowed
         [InlineData("", false)] // empty string is not allowed
         [InlineData(" ", false)] // whitespace is not allowed
-        [InlineData("test", false)] // no @
-        [InlineData("test@", false)] // no domain
+        [InlineData("test", false)] // missing @ is not allowed
+        [InlineData("test@", false)] // missing domain is not allowd
+        [InlineData("test@test", true)] // missing top level domain is allowed
         [InlineData("test@test.com", true)] // top level domain .com
         public void EmailAddressValidation_Tests(string email, bool expectedResult)
         {

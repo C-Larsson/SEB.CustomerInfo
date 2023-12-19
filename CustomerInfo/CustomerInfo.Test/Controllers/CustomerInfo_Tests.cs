@@ -129,5 +129,12 @@ namespace CustomerInfo.Test.Controllers
             var response = await _httpClient.DeleteAsync("/api/CustomerInfo/197210161234");
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         }
+
+        [Fact]
+        public async Task DeleteCustomer_NotFound()
+        {
+            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/197210161230"); // SSN does not exist
+            Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
+        }
     }
 }
