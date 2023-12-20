@@ -10,33 +10,28 @@ A MockDbContext class is simulating the database.
 # GitHub Repository URL:
 https://github.com/C-Larsson/SEB.CustomerInfo.git
 
-# Swagger URL:
-https://localhost:7251/swagger/index.html
-
 # Prerequisites
-Visual Studio 2022 (latest version)
-Docker Desktop
+Visual Studio 2022 (latest version),
+Docker Desktop,
 Git
 
-# Installation
+# Setting up development environment
 In Visual Studio, clone the GitHub Repository URL.
-Run CustomerInfo.REST project
-Test end points in a browser using the Swagger URL 
+To test end points in Swagger, run CustomerInfo.REST project and navigate browser to https://localhost:7251/swagger/index.html
 
 # Unit tests
 32 unit test have been implmented to test the solution.
 10 test cases are testing the four end points in the controller, and 22 test cases are validations of the CostomerInfo details.
 The tests can be run using Test Explorer in Visual Studio.
 
-# Building and running with Docker
-Open a terminal, navigate to your project directory, and run the following command to build the Docker image: 
+# Installation with Docker
+Open a terminal and navigate to your project directory.
+Build Docker image with command: 
 docker build -t customerinfo .
+Run the container using command: 
+docker run -d -p 8080:8080 --name myapp customerinfo
 
-Once the image is built, run it as a container with the following command:
-docker run -d -p 8080:80 --name myapp yourappname
 
-# Known Issues
-The build script for Docker generates an error and needs to be fixed
 
 # Contact
 Christoffer Larsson, larsson.christoffer@gmail.com

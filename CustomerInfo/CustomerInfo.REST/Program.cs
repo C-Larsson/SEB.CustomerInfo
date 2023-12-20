@@ -16,11 +16,15 @@ builder.Services.AddScoped<MockDbContext>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+/*if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}*/
+
+// Use Swagger in all environments for now
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -30,4 +34,4 @@ app.MapControllers();
 
 app.Run();
 
-public partial class Program { } // Needed for controller tests
+public partial class Program { } // Needed for unit tests of controllers
