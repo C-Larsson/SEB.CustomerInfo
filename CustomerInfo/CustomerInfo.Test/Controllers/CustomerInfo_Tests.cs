@@ -124,10 +124,10 @@ namespace CustomerInfo.Test.Controllers
         }
 
         [Fact]
-        public async Task DeleteCustomer_Ok()
+        public async Task DeleteCustomer_NoContent()
         {
             var response = await _httpClient.DeleteAsync("/api/CustomerInfo/197210161234");
-            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Fact]

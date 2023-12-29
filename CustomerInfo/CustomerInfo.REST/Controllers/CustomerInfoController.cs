@@ -1,6 +1,6 @@
 ﻿using CustomerInfo.REST.Models;
 using CustomerInfo.REST.Services;
-using CustomerInfo.REST.Utility;
+using CustomerInfo.REST.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerInfo.REST.Controllers
@@ -16,50 +16,42 @@ namespace CustomerInfo.REST.Controllers
             _customerInfoService = customerInfoService;
         }
 
-        // Get customer by ssn
         [HttpGet("{ssn}")]
-        public ActionResult<Customer> Get(string ssn)
+        [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<Customer> Get([SSN] string ssn)
         {
-            if (!SsnValidator.IsValid(ssn))
-                return BadRequest("Invalid format of Swedish SSN");
-
             var customer = _customerInfoService.GetBySsn(ssn);
 
-            if (customer == null)
-                return NotFound("Customer not found");
-
-            return Ok(customer);
+            return (customer == null) ?
+            Problem("Customer not found", statusCode: 404) :
+            Ok(customer);
         }
 
         // Create a new customer
         [HttpPost]
+        [ProducesResponseType<Customer>(StatusCodes.Status201Created)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
         public ActionResult<Customer> Post(Customer customer)
         {
-            if (!SsnValidator.IsValid(customer.SSN))
-                return BadRequest("Invalid format of Swedish SSN");
-
-            if (!PhoneNumberValidator.IsValid(customer.PhoneNumber))
-                return BadRequest("Invalid format of Swedish phone number");
-
             if (_customerInfoService.GetBySsn(customer.SSN) != null)
-                return Conflict("Customer already exists");
- 
+                return Problem("Customer already exists", statusCode: 409);
+
             var customerDB = _customerInfoService.Create(customer);
             return Created("Customer was created", customerDB);
         }
 
         // Update a customer
         [HttpPut]
+        [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
         public ActionResult<Customer> Put(Customer customer)
         {
-            if (!SsnValidator.IsValid(customer.SSN))
-                return BadRequest("Invalid format for Swedish SSN");
-
-            if (!PhoneNumberValidator.IsValid(customer.PhoneNumber))
-                return BadRequest("Invalid format of Swedish phone number");
-
             if (_customerInfoService.GetBySsn(customer.SSN) == null)
-                return NotFound("Customer does not exist");
+                return Problem("Customer does not exist", statusCode: 404);
 
             var customerDB = _customerInfoService.Update(customer);
             return Ok(customerDB);
@@ -67,14 +59,17 @@ namespace CustomerInfo.REST.Controllers
 
         // Delete a customer
         [HttpDelete("{ssn}")]
-        public IActionResult Delete(string ssn)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public IActionResult Delete([SSN] string ssn)
         {
             bool result = _customerInfoService.Delete(ssn);
 
             if (!result)
-                return NotFound("Customer was not found");
-  
-            return Ok("Customer was deleted");
+                return Problem("Customer not found", statusCode: 404);
+
+            return NoContent();
         }
 
     }

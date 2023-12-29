@@ -11,7 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICustomerInfoService, CustomerInfoService>();
-builder.Services.AddScoped<MockDbContext>();
+builder.Services.AddSingleton<MockDbContext>();
 
 var app = builder.Build();
 
