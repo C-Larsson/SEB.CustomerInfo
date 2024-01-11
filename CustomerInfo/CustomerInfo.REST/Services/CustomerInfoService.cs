@@ -6,40 +6,49 @@ namespace CustomerInfo.REST.Services
     public class CustomerInfoService : ICustomerInfoService
     {
 
-        private readonly MockDbContext _dbContext;
+        private readonly AppDbContext _dbContext;
 
-        public CustomerInfoService(MockDbContext dbContext)
+        public CustomerInfoService(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public Customer? GetBySsn(string ssn)
+        public async Task<Customer?> GetBySsn(string ssn)
         {
-            return _dbContext.Customers.Find(c => c.SSN == ssn);
+            return await _dbContext.Customers.FindAsync(ssn);
         }
 
-        public Customer Create(Customer customer)
+        public async Task<Customer> Create(Customer customer)
         {
             TransformPhoneIfNeeded(customer);
             _dbContext.Customers.Add(customer);
+            await _dbContext.SaveChangesAsync();
             return customer;
         }
 
-        public Customer Update(Customer customer)
+        public async Task<Customer> Update(Customer customer)
         {
             TransformPhoneIfNeeded(customer);
-            var customerDB = _dbContext.Customers.Find(c => c.SSN == customer.SSN);
+            var customerDB = await _dbContext.Customers.FindAsync(customer.SSN);
 
             // Only update if not null
             if (customer.Email != null) customerDB.Email = customer.Email; 
-            if (customer.PhoneNumber != null) customerDB.PhoneNumber = customer.PhoneNumber; 
-            
+            if (customer.PhoneNumber != null) customerDB.PhoneNumber = customer.PhoneNumber;
+
+            await _dbContext.SaveChangesAsync();
             return customerDB;
         }
 
-        public bool Delete(string ssn)
+        public async Task<bool> Delete(string ssn)
         {
-            return (_dbContext.Customers.RemoveAll(c => c.SSN == ssn) != 0);
+            var customer = await _dbContext.Customers.FindAsync(ssn);
+            if (customer != null)
+            {
+                _dbContext.Customers.Remove(customer);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         private void TransformPhoneIfNeeded(Customer customer)

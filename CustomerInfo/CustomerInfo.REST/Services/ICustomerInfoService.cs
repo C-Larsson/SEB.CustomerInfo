@@ -4,10 +4,10 @@ namespace CustomerInfo.REST.Services
 {
     public interface ICustomerInfoService
     {
-        Customer? GetBySsn(string ssn);
-        Customer Create(Models.Customer customerInfo);
-        Customer Update(Models.Customer customerInfo);
-        bool Delete(string ssn);
+        Task<Customer?> GetBySsn(string ssn);
+        Task<Customer> Create(Models.Customer customerInfo);
+        Task<Customer> Update(Models.Customer customerInfo);
+        Task<bool> Delete(string ssn);
 
     }
 }

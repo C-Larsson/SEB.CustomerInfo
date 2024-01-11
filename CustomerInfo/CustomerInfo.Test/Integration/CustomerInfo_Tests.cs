@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http.Json;
 
-namespace CustomerInfo.Test.Controllers
+namespace CustomerInfo.Test.Integration
 {
     public class CustomerInfo_Tests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -13,15 +13,22 @@ namespace CustomerInfo.Test.Controllers
         {
             _factory = factory;
             _httpClient = _factory.CreateClient();
+            // Seed database with test data
+            _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            {
+                SSN = "197210161234",
+                Email = "test@gmail.com",
+                PhoneNumber = "+46701234567"
+            }).Wait();
         }
 
         [Fact]
         public async Task GetCustomer_OK()
         {
-            var response = _httpClient.GetAsync("/api/CustomerInfo/197210161234");
-            Assert.Equal(System.Net.HttpStatusCode.OK, response.Result.StatusCode);
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/197210161234");
+            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
 
-            var customer = await response.Result.Content.ReadFromJsonAsync<Customer>();
+            var customer = await response.Content.ReadFromJsonAsync<Customer>();
             Assert.NotNull(customer);
             Assert.Equal("197210161234", customer.SSN);
             Assert.Equal("test@gmail.com", customer.Email);
@@ -29,10 +36,10 @@ namespace CustomerInfo.Test.Controllers
         }
 
         [Fact]
-        public void GetCustomer_NotFound()
+        public async Task GetCustomer_NotFound()
         {
-            var response = _httpClient.GetAsync("/api/CustomerInfo/197210161230"); // SSN does not exist
-            Assert.Equal(System.Net.HttpStatusCode.NotFound, response.Result.StatusCode);
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/197210161230"); // SSN does not exist
+            Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]

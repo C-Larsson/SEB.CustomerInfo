@@ -5,6 +5,7 @@ namespace CustomerInfo.REST.Models
 {
     public class Customer
     {
+        [Key]
         [SSN]
         public string SSN { get; set; }
 
