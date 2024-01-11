@@ -23,9 +23,13 @@ To test end points in Swagger, run CustomerInfo.REST project and navigate browse
 
 ## Installation with Docker
 Open a terminal and navigate to your project directory.
-Build Docker image with command: 
+
+Build Docker image with command:
+
 docker build -t customerinfo .
-Run the container using command: 
+
+Run the container using command:
+
 docker run -d -p 8080:8080 --name myapp customerinfo
 
 # Contact
