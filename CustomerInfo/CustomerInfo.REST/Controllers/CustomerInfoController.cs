@@ -1,7 +1,9 @@
 ﻿using CustomerInfo.REST.Models;
-using CustomerInfo.REST.Services;
+using CustomerInfo.REST.Services.CustomerInfoServices;
 using CustomerInfo.REST.Validation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CustomerInfo.REST.Controllers
 {
@@ -70,6 +72,15 @@ namespace CustomerInfo.REST.Controllers
                 return Problem("Customer not found", statusCode: 404);
 
             return NoContent();
+        }
+
+        [HttpGet("admin"), Authorize(Roles = "Admin")]
+        [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<Customer>>> GetUsers()
+        {
+            var result = await _customerInfoService.GetUsers();
+            return Ok(result);
         }
 
     }

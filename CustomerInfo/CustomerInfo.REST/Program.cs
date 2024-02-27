@@ -1,11 +1,15 @@
 using CustomerInfo.REST.Data;
 using CustomerInfo.REST.Models;
-using CustomerInfo.REST.Services;
 using CustomerInfo.REST.Validation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using CustomerInfo.REST.Services.CustomerInfoServices;
+using CustomerInfo.REST.Services.ApiKeyServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +30,25 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddProblemDetails();
 
 builder.Services.AddScoped<ICustomerInfoService, CustomerInfoService>();
+builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 
-// For demo purposes only
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseInMemoryDatabase("demoDB")
 );
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value))
+        };
+    });
+
 
 var app = builder.Build();
 
@@ -55,6 +73,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

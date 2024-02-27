@@ -1,7 +1,8 @@
 ﻿using CustomerInfo.REST.Data;
 using CustomerInfo.REST.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace CustomerInfo.REST.Services
+namespace CustomerInfo.REST.Services.CustomerInfoServices
 {
     public class CustomerInfoService : ICustomerInfoService
     {
@@ -32,7 +33,7 @@ namespace CustomerInfo.REST.Services
             var customerDB = await _dbContext.Customers.FindAsync(customer.SSN);
 
             // Only update if not null
-            if (customer.Email != null) customerDB.Email = customer.Email; 
+            if (customer.Email != null) customerDB.Email = customer.Email;
             if (customer.PhoneNumber != null) customerDB.PhoneNumber = customer.PhoneNumber;
 
             await _dbContext.SaveChangesAsync();
@@ -51,12 +52,18 @@ namespace CustomerInfo.REST.Services
             return false;
         }
 
+        public async Task<List<Customer>> GetUsers()
+        {
+            return await _dbContext.Customers.ToListAsync();
+        }
+
         private void TransformPhoneIfNeeded(Customer customer)
         {
             // Replace leading 0 with +46
             if (customer.PhoneNumber != null && customer.PhoneNumber.StartsWith("0"))
                 customer.PhoneNumber = $"+46{customer.PhoneNumber.Remove(0, 1)}";
         }
+
     }
 
 }

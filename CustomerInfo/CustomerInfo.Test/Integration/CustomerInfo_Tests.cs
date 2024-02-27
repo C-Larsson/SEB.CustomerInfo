@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace CustomerInfo.Test.Integration
@@ -143,5 +144,53 @@ namespace CustomerInfo.Test.Integration
             var response = await _httpClient.DeleteAsync("/api/CustomerInfo/197210161230"); // SSN does not exist
             Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
+
+        [Fact]
+        public async Task GetCustomers_Admin_OK()
+        {
+            // Prepare
+            var apiKeyModel = new ApiKeyModel()
+            {
+                // This is the key for the admin role in appsettings.json
+                ApiKey = "9m6KY9Q9aLFGiVsYeaSkQXu6hlgMnWrojzeOSuRiXvQOAHkvEfS9AmzWRadLOP9m"
+            };
+            var response1 = await _httpClient.PostAsJsonAsync<ApiKeyModel>("/api/auth/get-token/", apiKeyModel);
+            var accessToken = await response1.Content.ReadAsStringAsync();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/admin");
+            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+
+            var customers = await response.Content.ReadFromJsonAsync<List<Customer>>();
+            Assert.NotNull(customers);
+            Assert.Equal(1, customers.Count);
+        }
+
+        [Fact]
+        public async Task GetCustomers_User_Forbidden()
+        {
+            // Prepare
+            var apiKeyModel = new ApiKeyModel()
+            {
+                // This is the key for the user role in appsettings.json
+                ApiKey = "tWoNuTGFkErOBxl0RVZRZGs3LZwjCTtjDaJAQsmAwFBznufYj4QHfeOWALKFTlPO"
+            };
+            var response1 = await _httpClient.PostAsJsonAsync<ApiKeyModel>("/api/auth/get-token/", apiKeyModel);
+            var accessToken = await response1.Content.ReadAsStringAsync();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/admin");
+            
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetCustomers_Unauthorized()
+        {
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/admin");
+            
+            Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
     }
 }
