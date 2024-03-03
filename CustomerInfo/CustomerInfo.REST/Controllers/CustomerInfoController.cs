@@ -4,6 +4,7 @@ using CustomerInfo.REST.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace CustomerInfo.REST.Controllers
 {
@@ -32,7 +33,7 @@ namespace CustomerInfo.REST.Controllers
         }
 
         // Create a new customer
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "User, Admin")]
         [ProducesResponseType<Customer>(StatusCodes.Status201Created)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
@@ -46,7 +47,7 @@ namespace CustomerInfo.REST.Controllers
         }
 
         // Update a customer
-        [HttpPut]
+        [HttpPut, Authorize(Roles = "User, Admin")]
         [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
@@ -60,7 +61,7 @@ namespace CustomerInfo.REST.Controllers
         }
 
         // Delete a customer
-        [HttpDelete("{ssn}")]
+        [HttpDelete("admin/{ssn}"), Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
@@ -74,12 +75,33 @@ namespace CustomerInfo.REST.Controllers
             return NoContent();
         }
 
+        // Get all users
         [HttpGet("admin"), Authorize(Roles = "Admin")]
         [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<Customer>>> GetUsers()
         {
             var result = await _customerInfoService.GetUsers();
+            return Ok(result);
+        }
+
+        // Search for customers
+        [HttpGet("search/{searchText}/{page}")]
+        [ProducesResponseType<CustomerSearchResult>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<CustomerSearchResult>> SearchCustomers(string searchText, int page)
+        {
+            var result = await _customerInfoService.SearchCustomers(searchText, page);
+            return Ok(result);
+        }
+
+        // Get search suggestions
+        [HttpGet("search/suggestions/{searchText}")]
+        [ProducesResponseType<List<string>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<string>>> GetCustomerSearchSuggestions(string searchText)
+        {
+            var result = await _customerInfoService.GetCustomerSearchSuggestions(searchText);
             return Ok(result);
         }
 
