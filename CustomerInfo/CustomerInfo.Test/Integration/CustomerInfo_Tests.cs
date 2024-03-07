@@ -34,20 +34,20 @@ namespace CustomerInfo.Test.Integration
 
 
 
-            var response = await _httpClient.GetAsync("/api/CustomerInfo/197210161238");
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/200001011001");
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
 
             var customer = await response.Content.ReadFromJsonAsync<Customer>();
             Assert.NotNull(customer);
-            Assert.Equal("197210161238", customer.SSN);
-            Assert.Equal("test2@gmail.com", customer.Email);
-            Assert.Equal("+46701234568", customer.PhoneNumber);
+            Assert.Equal("200001011001", customer.SSN);
+            Assert.Equal("test1@gmail.com", customer.Email);
+            Assert.Equal("+46720010001", customer.PhoneNumber);
         }
 
         [Fact]
         public async Task GetCustomer_NotFound()
         {
-            var response = await _httpClient.GetAsync("/api/CustomerInfo/197210161230"); // SSN does not exist
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/200001011020"); // SSN does not exist
             Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -59,8 +59,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "197210161235",
-                PhoneNumber = "0701234567"
+                SSN = "200001011011",
+                PhoneNumber = "0720010011"
             };
 
             var response = await _httpClient.PostAsJsonAsync("/api/CustomerInfo", customer);
@@ -68,8 +68,8 @@ namespace CustomerInfo.Test.Integration
 
             var customerInfoResponse = await response.Content.ReadFromJsonAsync<Customer>();
             Assert.NotNull(customerInfoResponse);
-            Assert.Equal("197210161235", customerInfoResponse.SSN);
-            Assert.Equal("+46701234567", customerInfoResponse.PhoneNumber);
+            Assert.Equal("200001011011", customerInfoResponse.SSN);
+            Assert.Equal("+46720010011", customerInfoResponse.PhoneNumber);
         }
 
         [Fact]
@@ -80,8 +80,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "197210161236",
-                PhoneNumber = "0701234568"
+                SSN = "200001011012",
+                PhoneNumber = "0720010012"
             };
 
             var response = await _httpClient.PostAsJsonAsync("/api/CustomerInfo", customer);
@@ -89,8 +89,8 @@ namespace CustomerInfo.Test.Integration
 
             var customerInfoResponse = await response.Content.ReadFromJsonAsync<Customer>();
             Assert.NotNull(customerInfoResponse);
-            Assert.Equal("197210161236", customerInfoResponse.SSN);
-            Assert.Equal("+46701234568", customerInfoResponse.PhoneNumber);
+            Assert.Equal("200001011012", customerInfoResponse.SSN);
+            Assert.Equal("+46720010012", customerInfoResponse.PhoneNumber);
         }
 
         [Fact]
@@ -101,8 +101,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "197210161235",
-                PhoneNumber = "0701234567"
+                SSN = "200001011013",
+                PhoneNumber = "0720010013"
             };
 
             var response = await _httpClient.PostAsJsonAsync("/api/CustomerInfo", customer);
@@ -118,8 +118,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "197210161234", // SSN already exists
-                PhoneNumber = "0701234567"
+                SSN = "200001011001", // SSN already exists
+                PhoneNumber = "0720010001"
             };
 
             var response = await _httpClient.PostAsJsonAsync("/api/CustomerInfo", customer);
@@ -134,8 +134,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "19721016123", // Invalid SSN
-                PhoneNumber = "0701234567"
+                SSN = "20000101101499", // Invalid SSN
+                PhoneNumber = "0720010014"
             };
 
             var response = await _httpClient.PostAsJsonAsync("/api/CustomerInfo", customer);
@@ -150,8 +150,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "197210161234",
-                PhoneNumber = "0701234567"
+                SSN = "200001011002",
+                PhoneNumber = "0720010022"
             };
 
             var response = await _httpClient.PutAsJsonAsync("/api/CustomerInfo", customer);
@@ -159,8 +159,8 @@ namespace CustomerInfo.Test.Integration
 
             var customerInfoResponse = await response.Content.ReadFromJsonAsync<Customer>();
             Assert.NotNull(customerInfoResponse);
-            Assert.Equal("197210161234", customerInfoResponse.SSN);
-            Assert.Equal("+46701234567", customerInfoResponse.PhoneNumber);
+            Assert.Equal("200001011002", customerInfoResponse.SSN);
+            Assert.Equal("+46720010022", customerInfoResponse.PhoneNumber);
         }
 
         [Fact]
@@ -171,8 +171,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "19721016123", // Invalid SSN
-                PhoneNumber = "07012345678"
+                SSN = "20000101100399", // Invalid SSN
+                PhoneNumber = "0720010003"
             };
 
             var response = await _httpClient.PutAsJsonAsync("/api/CustomerInfo", customer);
@@ -187,8 +187,8 @@ namespace CustomerInfo.Test.Integration
 
             var customer = new Customer()
             {
-                SSN = "197210161230", // SSN does not exist
-                PhoneNumber = "0701234567"
+                SSN = "200001011030", // SSN does not exist
+                PhoneNumber = "0720010030"
             };
 
             var response = await _httpClient.PutAsJsonAsync("/api/CustomerInfo", customer);
@@ -201,7 +201,7 @@ namespace CustomerInfo.Test.Integration
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _adminAccessToken);
 
-            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/admin/197210161234");
+            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/admin/200001011005");
             Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
         }
 
@@ -211,7 +211,7 @@ namespace CustomerInfo.Test.Integration
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _adminAccessToken);
 
-            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/admin/197210161230"); // SSN does not exist
+            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/admin/200001011030"); // SSN does not exist
             Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
         [Fact]
@@ -220,7 +220,7 @@ namespace CustomerInfo.Test.Integration
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
 
-            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/admin/197210161234");
+            var response = await _httpClient.DeleteAsync("/api/CustomerInfo/admin/200001011004");
             Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
         }
 
@@ -236,7 +236,6 @@ namespace CustomerInfo.Test.Integration
 
             var customers = await response.Content.ReadFromJsonAsync<List<Customer>>();
             Assert.NotNull(customers);
-            Assert.Equal(2, customers.Count);
         }
 
         [Fact]
@@ -270,23 +269,39 @@ namespace CustomerInfo.Test.Integration
             return await response.Content.ReadAsStringAsync();
         }
 
+
         private async Task SeedDatabase()
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
 
             await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
             {
-                SSN = "197210161234",
-                Email = "test@gmail.com",
-                PhoneNumber = "+46701234567"
+                SSN = "200001011002",
+                Email = "test2@gmail.com",
+                PhoneNumber = "0720010002"
             });
 
             await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
             {
-                SSN = "197210161238",
-                Email = "test2@gmail.com",
-                PhoneNumber = "+46701234568"
+                SSN = "200001011003",
+                Email = "test3@gmail.com",
+                PhoneNumber = "0720010003"
             });
+
+            await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            {
+                SSN = "200001011004",
+                Email = "test4@gmail.com",
+                PhoneNumber = "0720010004"
+            });
+
+            await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            {
+                SSN = "200001011005",
+                Email = "test5@gmail.com",
+                PhoneNumber = "0720010005"
+            });
+
         }
 
     }

@@ -57,17 +57,17 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
             return await _dbContext.Customers.ToListAsync();
         }
 
-        public async Task<CustomerSearchResult> SearchCustomers(string searchText, int page)
+        public async Task<CustomerSearchResult> SearchCustomers(string searchText, int pageSize, int page)
         {
-            var pageResults = 2f;
-            var pageCount = Math.Ceiling((await FindCustomersBySearchText(searchText)).Count / pageResults);
+            var pageCount = Math.Ceiling((await FindCustomersBySearchText(searchText)).Count / (decimal) pageSize);
 
             var customers = await _dbContext.Customers
+                .OrderBy(c => c.SSN)
                 .Where(c => c.SSN.ToLower().Contains(searchText.ToLower()) ||
                     c.Email.ToLower().Contains(searchText.ToLower()) ||
                     c.PhoneNumber.ToLower().Contains(searchText.ToLower()))
-                .Skip((page - 1) * (int)pageResults)
-                .Take((int)pageResults)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
             
             return new CustomerSearchResult

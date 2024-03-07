@@ -9,7 +9,7 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
         Task<Customer> Create(Customer customerInfo);
         Task<Customer> Update(Customer customerInfo);
         Task<bool> Delete(string ssn);
-        Task<CustomerSearchResult> SearchCustomers(string searchText, int page);
+        Task<CustomerSearchResult> SearchCustomers(string searchText, int pageSize, int page);
         Task<List<string>> GetCustomerSearchSuggestions(string searchText);
 
     }

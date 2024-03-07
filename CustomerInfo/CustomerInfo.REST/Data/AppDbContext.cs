@@ -14,9 +14,9 @@ namespace CustomerInfo.REST.Data
             modelBuilder.Entity<Customer>().HasData(
                 new Customer()
                 {
-                    SSN = "197210161234",
-                    Email = "test@gmail.com",
-                    PhoneNumber = "+46701234567"
+                    SSN = "200001011001",
+                    Email = "test1@gmail.com",
+                    PhoneNumber = "+46720010001"
                 }
             );
         }

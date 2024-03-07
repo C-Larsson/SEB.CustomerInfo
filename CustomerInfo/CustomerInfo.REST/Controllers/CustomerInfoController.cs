@@ -86,12 +86,12 @@ namespace CustomerInfo.REST.Controllers
         }
 
         // Search for customers
-        [HttpGet("search/{searchText}/{page}")]
+        [HttpGet("search")]
         [ProducesResponseType<CustomerSearchResult>(StatusCodes.Status200OK)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<CustomerSearchResult>> SearchCustomers(string searchText, int page)
+        public async Task<ActionResult<CustomerSearchResult>> SearchCustomers([FromQuery] string searchText = "", [FromQuery]  int pageSize = 5, [FromQuery] int page = 1)
         {
-            var result = await _customerInfoService.SearchCustomers(searchText, page);
+            var result = await _customerInfoService.SearchCustomers(searchText, pageSize, page);
             return Ok(result);
         }
 
