@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -80,7 +81,58 @@ namespace CustomerInfo.Test.Integration
             Assert.Empty(customers);
         }
 
-     
+
+        [Fact]
+        public async Task GetCustomerSearchSuggestions_ReturnsMatchingEmail()
+        {
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/search/suggestions/test7");
+            var suggestions = await response.Content.ReadFromJsonAsync<List<string>>();
+
+            Assert.NotNull(suggestions);
+            Assert.Single(suggestions);
+            Assert.Equal("test7@gmail.com", suggestions.First());
+        }
+
+        [Fact]
+        public async Task GetCustomerSearchSuggestions_ReturnsMatchingSSN()
+        {
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/search/suggestions/11004");
+            var suggestions = await response.Content.ReadFromJsonAsync<List<string>>();
+
+            Assert.NotNull(suggestions);
+            Assert.Single(suggestions);
+            Assert.Equal("200001011004", suggestions.First());
+        }
+
+        [Fact]
+        public async Task GetCustomerSearchSuggestions_ReturnsMatchingPhoneNumber()
+        {
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/search/suggestions/10010");
+            var suggestions = await response.Content.ReadFromJsonAsync<List<string>>();
+
+            Assert.NotNull(suggestions);
+            Assert.Single(suggestions);
+            Assert.Equal("+46720010010", suggestions.First());
+        }
+
+
+        [Fact]
+        public async Task GetCustomerSearchSuggestions_WithInvalidSearchText_ReturnsEmptyList()
+        {
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/search/suggestions/invalid");
+            var suggestions = await response.Content.ReadFromJsonAsync<List<string>>();
+
+            Assert.NotNull(suggestions);
+            Assert.Empty(suggestions);
+        }
+
+        [Fact]
+        public async Task GetCustomerSearchSuggestions_WithNoSearchText_NotFound()
+        {
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/search/suggestions/");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
 
         private async Task<string> GetAccessToken(string apiKey)
         {

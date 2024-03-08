@@ -98,6 +98,7 @@ namespace CustomerInfo.REST.Controllers
         // Get search suggestions
         [HttpGet("search/suggestions/{searchText}")]
         [ProducesResponseType<List<string>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<string>>> GetCustomerSearchSuggestions(string searchText)
         {
