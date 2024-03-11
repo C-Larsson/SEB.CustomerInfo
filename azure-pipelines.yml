@@ -1,29 +1,32 @@
-# Docker
-# Build a Docker image
+# 
+# Build Pipeline
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
 - main
 
-resources:
-- repo: self
+pool:
+  vmImage: 'ubuntu-latest'
 
 variables:
   tag: '$(Build.BuildId)'
+  buildConfiguration: 'Release'
+  
+steps:
+- task: UseDotNet@2
+  inputs:
+    version: '8.0'
+    packageType: 'sdk'
 
-stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/CustomerInfo/CustomerInfo.REST/Dockerfile'
-        tags: |
-          $(tag)
+- script: |
+    dotnet restore
+    dotnet build --configuration $(buildConfiguration) --no-restore
+    dotnet test --no-restore --verbosity normal
+    dotnet publish --no-restore --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+  displayName: 'DotNet Core Build and Publish'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
