@@ -1,4 +1,6 @@
-﻿namespace CustomerInfo.REST.Models
+﻿using CustomerInfo.REST.Entities;
+
+namespace CustomerInfo.REST.DTOs
 {
     public class CustomerSearchResult
     {

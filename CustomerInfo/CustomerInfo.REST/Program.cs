@@ -1,8 +1,4 @@
 using CustomerInfo.REST.Data;
-using CustomerInfo.REST.Models;
-using CustomerInfo.REST.Validation;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -33,7 +29,7 @@ builder.Services.AddScoped<ICustomerInfoService, CustomerInfoService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 
 builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseInMemoryDatabase("demoDB")
+    options => options.UseInMemoryDatabase("CustomerInfoDB")
 );
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -58,13 +54,6 @@ using (var serviceScope = app.Services.CreateScope())
     var dbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
 }
-
-// Configure the HTTP request pipeline.
-/*if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}*/
 
 
 // Use Swagger in all environments for now

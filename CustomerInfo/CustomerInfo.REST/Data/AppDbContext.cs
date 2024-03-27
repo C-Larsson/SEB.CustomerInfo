@@ -1,4 +1,4 @@
-﻿using CustomerInfo.REST.Models;
+﻿using CustomerInfo.REST.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerInfo.REST.Data
@@ -8,17 +8,14 @@ namespace CustomerInfo.REST.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Customer> Customers { get; set; }
 
+
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Customer>().HasIndex(c => c.SSN).IsUnique();
           
-            modelBuilder.Entity<Customer>().HasData(
-                new Customer()
-                {
-                    SSN = "200001011001",
-                    Email = "test1@gmail.com",
-                    PhoneNumber = "+46720010001"
-                }
-            );
         }
     }
 }

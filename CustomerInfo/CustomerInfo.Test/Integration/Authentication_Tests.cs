@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using CustomerInfo.REST.DTOs;
+using Microsoft.AspNetCore.Mvc.Testing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
@@ -23,14 +24,14 @@ namespace CustomerInfo.Test.Integration
         public async Task GetToken_OK()
         {
             // Prepare
-            var apiKeyModel = new ApiKeyModel()
+            var apiKey = new ApiKeyDto()
             {
                 // This is the key for the admin role in appsettings.json
                 ApiKey = "9m6KY9Q9aLFGiVsYeaSkQXu6hlgMnWrojzeOSuRiXvQOAHkvEfS9AmzWRadLOP9m" 
             };
 
             // Act
-            var response = await _httpClient.PostAsJsonAsync<ApiKeyModel>("/api/auth/get-token/", apiKeyModel);
+            var response = await _httpClient.PostAsJsonAsync<ApiKeyDto>("/api/auth/get-token/", apiKey);
             var result = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -42,13 +43,13 @@ namespace CustomerInfo.Test.Integration
         public async Task GetToken_Unauthorized()
         {
             // Prepare
-            var apiKeyModel = new ApiKeyModel()
+            var apiKey = new ApiKeyDto()
             {
                 ApiKey = "405e34f0-3235-4507-a153-6c75561c751a" // Invalid key
             };
 
             // Act
-            var response = await _httpClient.PostAsJsonAsync<ApiKeyModel>("/api/auth/get-token/", apiKeyModel);
+            var response = await _httpClient.PostAsJsonAsync<ApiKeyDto>("/api/auth/get-token/", apiKey);
 
             // Assert
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);

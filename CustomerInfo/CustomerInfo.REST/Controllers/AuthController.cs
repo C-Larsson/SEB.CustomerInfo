@@ -1,4 +1,4 @@
-﻿using CustomerInfo.REST.Models;
+﻿using CustomerInfo.REST.DTOs;
 using CustomerInfo.REST.Services.ApiKeyServices;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -22,7 +22,7 @@ namespace CustomerInfo.REST.Controllers
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
-        public ActionResult<string> GetToken(ApiKeyModel apiKeyModel)
+        public ActionResult<string> GetToken(ApiKeyDto apiKeyModel)
         {
             if (_apiKeyService.ValidateKey(apiKeyModel.ApiKey, out string role))
             {

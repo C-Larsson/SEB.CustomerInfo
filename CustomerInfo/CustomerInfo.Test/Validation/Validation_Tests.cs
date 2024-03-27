@@ -20,6 +20,7 @@ namespace CustomerInfo.Test.Validation
             var customer = new Customer()
             {
                 SSN = "197210161234",
+                Name = "Test Testsson",
                 Email = email
             };
 
@@ -50,6 +51,7 @@ namespace CustomerInfo.Test.Validation
             var customer = new Customer()
             {
                 SSN = ssn,
+                Name = "Test Testsson",
             };
 
             var context = new ValidationContext(customer, serviceProvider: null, items: null);
@@ -76,6 +78,7 @@ namespace CustomerInfo.Test.Validation
             var customer = new Customer()
             {
                 SSN = "197210161234",
+                Name = "Test Testsson",
                 PhoneNumber = phoneNumber
             };
 

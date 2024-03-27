@@ -1,5 +1,4 @@
-﻿using CustomerInfo.REST.Models;
-
+﻿
 namespace CustomerInfo.REST.Services.ApiKeyServices
 {
     public interface IApiKeyService

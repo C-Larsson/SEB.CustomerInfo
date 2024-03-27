@@ -1,10 +1,10 @@
-﻿using CustomerInfo.REST.Models;
+﻿using CustomerInfo.REST.Validation;
 using CustomerInfo.REST.Services.CustomerInfoServices;
-using CustomerInfo.REST.Validation;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Data;
+using CustomerInfo.REST.DTOs;
+using CustomerInfo.REST.Entities;
 
 namespace CustomerInfo.REST.Controllers
 {
@@ -51,7 +51,22 @@ namespace CustomerInfo.REST.Controllers
         [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Customer>> Put(Customer customer)
+        public async Task<ActionResult<Customer>> Put(CustomerDto customerDto)
+        {
+            if (await _customerInfoService.GetBySsn(customerDto.SSN) == null)
+                return Problem("Customer does not exist", statusCode: 404);
+
+            var customer = customerDto.Adapt<Customer>();
+            var customerDB = await _customerInfoService.Update(customer);
+            return Ok(customerDB);
+        }
+
+        /*
+        [HttpPatch, Authorize(Roles = "User, Admin")]
+        [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Customer>> Patch(Customer customer)
         {
             if (await _customerInfoService.GetBySsn(customer.SSN) == null)
                 return Problem("Customer does not exist", statusCode: 404);
@@ -59,6 +74,7 @@ namespace CustomerInfo.REST.Controllers
             var customerDB = await _customerInfoService.Update(customer);
             return Ok(customerDB);
         }
+        */
 
         // Delete a customer
         [HttpDelete("admin/{ssn}"), Authorize(Roles = "Admin")]
@@ -76,13 +92,14 @@ namespace CustomerInfo.REST.Controllers
         }
 
         // Get all users
-        [HttpGet("admin"), Authorize(Roles = "Admin")]
-        [ProducesResponseType<Customer>(StatusCodes.Status200OK)]
+        [HttpGet("all"), Authorize(Roles = "User, Admin")]
+        [ProducesResponseType<CustomerDto>(StatusCodes.Status200OK)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Customer>>> GetUsers()
+        public async Task<ActionResult<List<CustomerDto>>> GetUsers()
         {
-            var result = await _customerInfoService.GetUsers();
-            return Ok(result);
+            var customers = await _customerInfoService.GetUsers();
+            var customerDTOs = customers.Adapt<List<CustomerDto>>();
+            return Ok(customerDTOs);
         }
 
         // Search for customers

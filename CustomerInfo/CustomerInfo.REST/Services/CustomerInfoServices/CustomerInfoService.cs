@@ -1,6 +1,8 @@
 ﻿using CustomerInfo.REST.Data;
-using CustomerInfo.REST.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.X86;
+using CustomerInfo.REST.DTOs;
+using CustomerInfo.REST.Entities;
 
 namespace CustomerInfo.REST.Services.CustomerInfoServices
 {
@@ -16,7 +18,8 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
 
         public async Task<Customer?> GetBySsn(string ssn)
         {
-            return await _dbContext.Customers.FindAsync(ssn);
+            var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.SSN.Equals(ssn) && c.IsDeleted == false);
+            return customer;
         }
 
         public async Task<Customer> Create(Customer customer)
@@ -30,7 +33,7 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
         public async Task<Customer> Update(Customer customer)
         {
             TransformPhoneIfNeeded(customer);
-            var customerDB = await _dbContext.Customers.FindAsync(customer.SSN);
+            var customerDB = await _dbContext.Customers.FirstOrDefaultAsync(c => c.SSN.Equals(customer.SSN) && c.IsDeleted == false);
 
             // Only update if not null
             if (customer.Email != null) customerDB.Email = customer.Email;
@@ -42,10 +45,10 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
 
         public async Task<bool> Delete(string ssn)
         {
-            var customer = await _dbContext.Customers.FindAsync(ssn);
+            var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.SSN.Equals(ssn) && c.IsDeleted == false);
             if (customer != null)
             {
-                _dbContext.Customers.Remove(customer);
+                customer.IsDeleted = true;
                 await _dbContext.SaveChangesAsync();
                 return true;
             }
@@ -54,7 +57,7 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
 
         public async Task<List<Customer>> GetUsers()
         {
-            return await _dbContext.Customers.ToListAsync();
+            return await _dbContext.Customers.Where(c => c.IsDeleted == false).ToListAsync();
         }
 
         public async Task<CustomerSearchResult> SearchCustomers(string searchText, int pageSize, int page)
@@ -63,9 +66,11 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
 
             var customers = await _dbContext.Customers
                 .OrderBy(c => c.SSN)
-                .Where(c => c.SSN.ToLower().Contains(searchText.ToLower()) ||
+                .Where(c => (c.SSN.ToLower().Contains(searchText.ToLower()) ||
                     c.Email.ToLower().Contains(searchText.ToLower()) ||
-                    c.PhoneNumber.ToLower().Contains(searchText.ToLower()))
+                    c.PhoneNumber.ToLower().Contains(searchText.ToLower())) && 
+                    c.IsDeleted == false
+                    )
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -106,9 +111,10 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
         private async Task<List<Customer>> FindCustomersBySearchText(string searchText)
         {
             return await _dbContext.Customers
-                .Where(c => c.SSN.ToLower().Contains(searchText.ToLower()) ||
+                .Where(c => (c.SSN.ToLower().Contains(searchText.ToLower()) ||
                     c.Email.ToLower().Contains(searchText.ToLower()) ||
-                    c.PhoneNumber.ToLower().Contains(searchText.ToLower())).ToListAsync();
+                    c.PhoneNumber.ToLower().Contains(searchText.ToLower())) && 
+                    c.IsDeleted == false).ToListAsync();
         }
 
     }

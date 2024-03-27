@@ -1,13 +1,18 @@
 ﻿using CustomerInfo.REST.Validation;
 using System.ComponentModel.DataAnnotations;
 
-namespace CustomerInfo.REST.Models
+namespace CustomerInfo.REST.Entities
 {
-    public class Customer
+    public class Customer : BaseEntity
     {
         [Key]
+        public int Id { get; set; }
+
         [SSN]
-        public string SSN { get; set; }
+        public required string SSN { get; set; }
+
+        [Required(ErrorMessage = "Name is required.")]
+        public required string Name { get; set; }
 
         [EmailAddress(ErrorMessage = "Invalid e-mail address.")]
         public string? Email { get; set; }

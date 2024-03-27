@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using CustomerInfo.REST.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CustomerInfo.Test.Integration
 {
-    public class CustomerInfo_Tests : IClassFixture<WebApplicationFactory<Program>>
+    [Collection("Sequential")]
+    public class CustomerInfo_Tests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
 
         private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _httpClient;
+        private readonly AppDbContext _dbContext;
         
         private readonly string _userApiKey = "tWoNuTGFkErOBxl0RVZRZGs3LZwjCTtjDaJAQsmAwFBznufYj4QHfeOWALKFTlPO";
         private readonly string _adminApiKey = "9m6KY9Q9aLFGiVsYeaSkQXu6hlgMnWrojzeOSuRiXvQOAHkvEfS9AmzWRadLOP9m";
@@ -20,19 +24,22 @@ namespace CustomerInfo.Test.Integration
         {
             _factory = factory;
             _httpClient = _factory.CreateClient();
-            _userAccessToken = GetAccessToken(_userApiKey).Result;
-            _adminAccessToken = GetAccessToken(_adminApiKey).Result;
+
+            var scope = factory.Services.GetService<IServiceScopeFactory>().CreateScope();
+            _dbContext = scope.ServiceProvider.GetService<AppDbContext>();
 
             SeedDatabase().Wait();
+           
+            _userAccessToken = GetAccessToken(_userApiKey).Result;
+            _adminAccessToken = GetAccessToken(_adminApiKey).Result;
         }
+
 
         [Fact]
         public async Task GetCustomer_OK()
         {
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
-
-
 
             var response = await _httpClient.GetAsync("/api/CustomerInfo/200001011001");
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
@@ -57,9 +64,10 @@ namespace CustomerInfo.Test.Integration
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _adminAccessToken);
 
-            var customer = new Customer()
+            var customer = new CustomerDto()
             {
                 SSN = "200001011011",
+                Name = "Test11 Testsson",
                 PhoneNumber = "0720010011"
             };
 
@@ -81,6 +89,7 @@ namespace CustomerInfo.Test.Integration
             var customer = new Customer()
             {
                 SSN = "200001011012",
+                Name = "Test12 Testsson",
                 PhoneNumber = "0720010012"
             };
 
@@ -102,6 +111,7 @@ namespace CustomerInfo.Test.Integration
             var customer = new Customer()
             {
                 SSN = "200001011013",
+                Name = "Test13 Testsson",
                 PhoneNumber = "0720010013"
             };
 
@@ -111,7 +121,7 @@ namespace CustomerInfo.Test.Integration
 
 
         [Fact]
-        public async Task CreateCustomer_User_Conflict()
+        public async Task CreateCustomer_Conflict()
         {
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
@@ -119,6 +129,7 @@ namespace CustomerInfo.Test.Integration
             var customer = new Customer()
             {
                 SSN = "200001011001", // SSN already exists
+                Name = "Test1 Testsson",
                 PhoneNumber = "0720010001"
             };
 
@@ -127,7 +138,7 @@ namespace CustomerInfo.Test.Integration
         }
 
         [Fact]
-        public async Task CreateCustomer_User_BadRequest_SSN()
+        public async Task CreateCustomer_BadRequest()
         {
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
@@ -135,6 +146,7 @@ namespace CustomerInfo.Test.Integration
             var customer = new Customer()
             {
                 SSN = "20000101101499", // Invalid SSN
+                Name = "Test14 Testsson",
                 PhoneNumber = "0720010014"
             };
 
@@ -151,6 +163,7 @@ namespace CustomerInfo.Test.Integration
             var customer = new Customer()
             {
                 SSN = "200001011002",
+                Name = "Test2 Testsson",
                 PhoneNumber = "0720010022"
             };
 
@@ -164,14 +177,15 @@ namespace CustomerInfo.Test.Integration
         }
 
         [Fact]
-        public async Task UpdateCustomer_BadRequest_SSN()
+        public async Task UpdateCustomer_BadRequest()
         {
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
 
-            var customer = new Customer()
+            var customer = new CustomerDto()
             {
                 SSN = "20000101100399", // Invalid SSN
+                Name = "Test3 Testsson",
                 PhoneNumber = "0720010003"
             };
 
@@ -185,9 +199,10 @@ namespace CustomerInfo.Test.Integration
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
 
-            var customer = new Customer()
+            var customer = new CustomerDto()
             {
                 SSN = "200001011030", // SSN does not exist
+                Name = "Test30 Testsson",
                 PhoneNumber = "0720010030"
             };
 
@@ -206,7 +221,7 @@ namespace CustomerInfo.Test.Integration
         }
 
         [Fact]
-        public async Task DeleteCustomer_Admin_NotFound()
+        public async Task DeleteCustomer_NotFound()
         {
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _adminAccessToken);
@@ -231,7 +246,7 @@ namespace CustomerInfo.Test.Integration
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _adminAccessToken);
 
-            var response = await _httpClient.GetAsync("/api/CustomerInfo/admin");
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/all");
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
 
             var customers = await response.Content.ReadFromJsonAsync<List<Customer>>();
@@ -239,13 +254,13 @@ namespace CustomerInfo.Test.Integration
         }
 
         [Fact]
-        public async Task GetCustomers_User_Forbidden()
+        public async Task GetCustomers_User_OK()
         {
             // Prepare
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
-            var response = await _httpClient.GetAsync("/api/CustomerInfo/admin");
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/all");
             
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
@@ -253,55 +268,75 @@ namespace CustomerInfo.Test.Integration
         {
             // Remove access token
             _httpClient.DefaultRequestHeaders.Authorization = null;
-            var response = await _httpClient.GetAsync("/api/CustomerInfo/admin");
+            var response = await _httpClient.GetAsync("/api/CustomerInfo/all");
             
             Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
         }
 
 
-        private async Task<string> GetAccessToken(string apiKey)
+        void IDisposable.Dispose()
         {
-            var apiKeyModel = new ApiKeyModel()
-            {
-                ApiKey = apiKey
-            };
-            var response = await _httpClient.PostAsJsonAsync<ApiKeyModel>("/api/auth/get-token/", apiKeyModel);
-            return await response.Content.ReadAsStringAsync();
+            _httpClient.Dispose();
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
 
 
+        private async Task<string> GetAccessToken(string apiKey)
+        {
+            var apiKeyModel = new ApiKeyDto()
+            {
+                ApiKey = apiKey
+            };
+            var response = await _httpClient.PostAsJsonAsync<ApiKeyDto>("/api/auth/get-token/", apiKeyModel);
+            return await response.Content.ReadAsStringAsync();
+        }
+
+       
         private async Task SeedDatabase()
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userAccessToken);
 
-            await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            _dbContext.Customers.Add(new Customer()
+            {
+                SSN = "200001011001",
+                Name = "Test1 Testsson",
+                Email = "test1@gmail.com",
+                PhoneNumber = "+46720010001"
+            });
+
+            _dbContext.Customers.Add(new Customer()
             {
                 SSN = "200001011002",
+                Name = "Test2 Testsson",
                 Email = "test2@gmail.com",
-                PhoneNumber = "0720010002"
+                PhoneNumber = "+46720010002"
             });
 
-            await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            _dbContext.Customers.Add(new Customer()
             {
                 SSN = "200001011003",
+                Name = "Test3 Testsson",
                 Email = "test3@gmail.com",
-                PhoneNumber = "0720010003"
+                PhoneNumber = "+46720010003"
             });
 
-            await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            _dbContext.Customers.Add(new Customer()
             {
                 SSN = "200001011004",
+                Name = "Test4 Testsson",
                 Email = "test4@gmail.com",
-                PhoneNumber = "0720010004"
+                PhoneNumber = "+46720010004"
             });
 
-            await _httpClient.PostAsJsonAsync("/api/CustomerInfo", new Customer()
+            _dbContext.Customers.Add(new Customer()
             {
                 SSN = "200001011005",
+                Name = "Test5 Testsson",
                 Email = "test5@gmail.com",
-                PhoneNumber = "0720010005"
+                PhoneNumber = "+46720010005"
             });
 
+            await _dbContext.SaveChangesAsync();
         }
 
     }

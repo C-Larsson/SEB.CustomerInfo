@@ -1,2 +1,3 @@
 global using Xunit;
-global using CustomerInfo.REST.Models;
+global using CustomerInfo.REST.DTOs;
+global using CustomerInfo.REST.Entities;

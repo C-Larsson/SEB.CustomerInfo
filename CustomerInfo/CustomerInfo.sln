@@ -10,6 +10,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerInfo.Test", "Custom
 		{A7922239-D575-43B9-AFE9-6EAD1959764C} = {A7922239-D575-43B9-AFE9-6EAD1959764C}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E46B51FF-E77C-4EFF-810A-0DA0519AACB5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A16A60C2-4771-41BC-9707-7A1649448790}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A7922239-D575-43B9-AFE9-6EAD1959764C} = {E46B51FF-E77C-4EFF-810A-0DA0519AACB5}
+		{7F3D422D-6999-48A9-AD16-05CCFB6F9083} = {A16A60C2-4771-41BC-9707-7A1649448790}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F71CC7E9-3319-427E-831F-3B5E67732A50}
