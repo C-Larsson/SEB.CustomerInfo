@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Runtime.Intrinsics.X86;
 using CustomerInfo.REST.DTOs;
 using CustomerInfo.REST.Entities;
+using CustomerInfo.REST.Utilities;
 
 namespace CustomerInfo.REST.Services.CustomerInfoServices
 {
@@ -101,6 +102,14 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
             return result;
         }
 
+        public async Task<Customer> GenerateTestCustomer()
+        {
+            var testCustomer = new TestCustomer();
+            var customer = _dbContext.Customers.Add(testCustomer).Entity;
+            await _dbContext.SaveChangesAsync();
+            return customer;
+        }
+
         private void TransformPhoneIfNeeded(Customer customer)
         {
             // Replace leading 0 with +46
@@ -116,6 +125,7 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
                     c.PhoneNumber.ToLower().Contains(searchText.ToLower())) && 
                     c.IsDeleted == false).ToListAsync();
         }
+
 
     }
 

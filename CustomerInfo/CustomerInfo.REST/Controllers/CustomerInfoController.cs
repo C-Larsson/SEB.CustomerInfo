@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CustomerInfo.REST.DTOs;
 using CustomerInfo.REST.Entities;
+using CustomerInfo.REST.Utilities;
 
 namespace CustomerInfo.REST.Controllers
 {
@@ -122,6 +123,17 @@ namespace CustomerInfo.REST.Controllers
             var result = await _customerInfoService.GetCustomerSearchSuggestions(searchText);
             return Ok(result);
         }
+
+        // Create a test customer
+        [HttpPost("test/customer")]
+        [ProducesResponseType<Customer>(StatusCodes.Status201Created)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<Customer> CreateTestCustomer()
+        {
+            var testCustomer = _customerInfoService.GenerateTestCustomer();
+            return Created("Test customer was created", testCustomer);
+        }
+
 
     }
 }

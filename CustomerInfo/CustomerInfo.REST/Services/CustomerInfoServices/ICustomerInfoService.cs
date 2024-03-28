@@ -12,6 +12,7 @@ namespace CustomerInfo.REST.Services.CustomerInfoServices
         Task<bool> Delete(string ssn);
         Task<CustomerSearchResult> SearchCustomers(string searchText, int pageSize, int page);
         Task<List<string>> GetCustomerSearchSuggestions(string searchText);
+        Task<Customer> GenerateTestCustomer();
 
     }
 }
